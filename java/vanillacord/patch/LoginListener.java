@@ -1,6 +1,7 @@
 package vanillacord.patch;
 
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import vanillacord.data.FieldData;
@@ -257,5 +258,17 @@ public class LoginListener extends ClassVisitor implements Function<ClassVisitor
             };
         }
         return super.visitMethod(access, name, descriptor, signature, exceptions);
+    }
+
+    @Override
+    public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
+        if (file.sources.connection != null
+                && file.sources.connection.name.equals(name)
+                && file.sources.connection.descriptor.equals(descriptor)) {
+
+            access = (access & ~ACC_PRIVATE) | ACC_PUBLIC;
+        }
+
+        return super.visitField(access, name, descriptor, signature, value);
     }
 }

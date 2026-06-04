@@ -1,9 +1,14 @@
 package vanillacord.server;
 
 import bridge.Invocation;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
+
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 import vanillacord.translation.HandshakePacket;
@@ -53,8 +58,8 @@ public class BungeeHelper extends ForwardingHelper {
                     boolean invalid = true;
                     final Property[] modified = new Property[length = properties.length - 1];
                     for (Property property : properties) {
-                        if ("bungeeguard-token".equals(property.getName())) {
-                            if (invalid = !invalid || Arrays.binarySearch(seecrets, property.getValue()) < 0) {
+                        if ("bungeeguard-token".equals(property.name())) {
+                            if (invalid = !invalid || Arrays.binarySearch(seecrets, property.value()) < 0) {
                                 break;
                             }
                         } else if (i != length) {
@@ -70,16 +75,18 @@ public class BungeeHelper extends ForwardingHelper {
         }
     }
 
-    public GameProfile injectProfile(Object connection, String username) {
-        try {
-            Channel channel = new Invocation(PlayerConnection.class).ofMethod("getChannel").with(connection).invoke();
-            GameProfile profile = new GameProfile(channel.attr(UUID_KEY).get(), username);
-            for (Property property : channel.attr(PROPERTIES_KEY).get()) {
-                profile.getProperties().put(property.getName(), property);
-            }
-            return profile;
-        } catch (Exception e) {
-            throw QuietException.show(e);
-        }
-    }
+
+     public GameProfile injectProfile(Object connection, String username) { 
+         try { 
+             Channel channel = new Invocation(PlayerConnection.class).ofMethod("getChannel").with(connection).invoke(); 
+             Multimap<String, Property> properties = ArrayListMultimap.create();
+             for (Property property : channel.attr(PROPERTIES_KEY).get()) { 
+                properties.put(property.name(), property); 
+             } 
+             GameProfile profile = new GameProfile(channel.attr(UUID_KEY).get(), username, new PropertyMap(properties)); 
+             return profile; 
+         } catch (Exception e) { 
+             throw QuietException.show(e); 
+         } 
+     } 
 }
