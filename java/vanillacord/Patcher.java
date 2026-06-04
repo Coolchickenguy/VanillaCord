@@ -167,6 +167,9 @@ public final class Patcher {
             zos.putNextEntry(new ZipEntry("vanillacord/server/ForwardingHelper.class"));
             copy(vccl.getResourceAsStream("vanillacord/server/ForwardingHelper.class"), zos, buffer);
 
+            zos.putNextEntry(new ZipEntry("vanillacord/server/AuthlibShims.class"));
+            copy(vccl.getResourceAsStream("vanillacord/server/AuthlibShims.class"), zos, buffer);
+
             Updater updater = new Updater(vccl, file);
             updater.update("vanillacord/server/BungeeHelper.class", zos, buffer);
 

@@ -58,8 +58,8 @@ public class BungeeHelper extends ForwardingHelper {
                     boolean invalid = true;
                     final Property[] modified = new Property[length = properties.length - 1];
                     for (Property property : properties) {
-                        if ("bungeeguard-token".equals(property.name())) {
-                            if (invalid = !invalid || Arrays.binarySearch(seecrets, property.value()) < 0) {
+                        if ("bungeeguard-token".equals(AuthlibShims.getName(property))) {
+                            if (invalid = !invalid || Arrays.binarySearch(seecrets, AuthlibShims.getValue(property)) < 0) {
                                 break;
                             }
                         } else if (i != length) {
@@ -81,9 +81,9 @@ public class BungeeHelper extends ForwardingHelper {
              Channel channel = new Invocation(PlayerConnection.class).ofMethod("getChannel").with(connection).invoke(); 
              Multimap<String, Property> properties = ArrayListMultimap.create();
              for (Property property : channel.attr(PROPERTIES_KEY).get()) { 
-                properties.put(property.name(), property); 
+                properties.put(AuthlibShims.getName(property), property); 
              } 
-             GameProfile profile = new GameProfile(channel.attr(UUID_KEY).get(), username, new PropertyMap(properties)); 
+             GameProfile profile = AuthlibShims.shimProfile(channel.attr(UUID_KEY).get(), username, properties); 
              return profile; 
          } catch (Exception e) { 
              throw QuietException.show(e); 

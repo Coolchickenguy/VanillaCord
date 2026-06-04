@@ -100,7 +100,7 @@ public class VelocityHelper extends ForwardingHelper {
                 properties.put(name, new Property(name, readString(data), (data.readBoolean())? readString(data) : null));
             }
 
-            GameProfile profile = new GameProfile(playerUuid, playerName, new PropertyMap(properties));
+            GameProfile profile = AuthlibShims.shimProfile(playerUuid, playerName, properties);
             channel.attr(PROFILE_KEY).set(profile);
 
             // Continue login flow
